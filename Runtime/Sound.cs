@@ -56,6 +56,7 @@ namespace SoundSystem
         }
 
         [ContextMenu("Delete this")]
+        [Button]
         private void DeleteThis()
         {
             _myLibrary.Sounds.Remove(this);
