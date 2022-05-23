@@ -1,5 +1,6 @@
 {
-    "name": "Unity.com.lucasboe.simple-sound-system",
+    "name": "LucasBoe.UIFramework",
+    "rootNamespace": "",
     "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
