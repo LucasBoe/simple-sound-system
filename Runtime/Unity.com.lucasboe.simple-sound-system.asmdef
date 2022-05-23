@@ -2,7 +2,7 @@
     "name": "LucasBoe.SoundSystem",
     "rootNamespace": "",
     "references": [
-        "NaughtyAttributes",
+        "NaughtyAttributes"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
