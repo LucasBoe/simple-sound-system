@@ -1,7 +1,9 @@
 {
-    "name": "LucasBoe.UIFramework",
+    "name": "LucasBoe.SoundSystem",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "NaughtyAttributes",
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,
