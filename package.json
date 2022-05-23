@@ -4,6 +4,9 @@
   "version": "0.0.2",
   "unity": "2020.3",
   "description": "a simple scriptable oject based sound integration solution.",
+  "dependencies": {
+    "com.dbrizov.naughtyattributes": "https://github.com/dbrizov/NaughtyAttributes.git#upm"
+  },
   "keywords": [
     "unity",
 	"unity3d",
