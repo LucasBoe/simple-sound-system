@@ -12,7 +12,9 @@ namespace SoundSystem
     public class Sound : ScriptableObject
     {
         [SerializeField, ReadOnly] private SoundLibrary _myLibrary;
-        [SerializeField, OnValueChanged("Rename")] AudioClip clip;
+        [SerializeField, OnValueChanged("Rename"), HideIf("useMultipleClipVariants")] AudioClip clip;
+        [SerializeField] bool useMultipleClipVariants = false;
+        [SerializeField, ShowIf("useMultipleClipVariants"), OnValueChanged("Rename")] List<AudioClip> clips = new List<AudioClip>();
         [SerializeField, Range(0,1)] float volume = 0.5f;
 
         [SerializeField, Range(0, 3), HideIf("randomizePitch")] float pitch = 1f;
@@ -22,7 +24,7 @@ namespace SoundSystem
 
 
         public SoundLibrary MyLibrary { get => _myLibrary; }
-        public string Name { get => clip.name; }
+        public string Name { get => clip != null ? clip.name : (clips.Count > 0 && clips[0] != null) ? clips[0].name : "New Sound"; }
 
         public void Play()
         {
@@ -34,11 +36,13 @@ namespace SoundSystem
             SoundManager.Instance.Play(this, position);
         }
 
-        internal void Configure(AudioSource audioSource)
+        internal float Configure(AudioSource audioSource)
         {
-            audioSource.clip = clip;
+            AudioClip c = useMultipleClipVariants ? clips[Random.Range(0,clips.Count)] : clip;
+            audioSource.clip = c;
             audioSource.volume = volume;
             audioSource.pitch = randomizePitch ? Random.Range(pitchRange.x, pitchRange.y) : pitch;
+            return c.length;
         }
 
 #if UNITY_EDITOR

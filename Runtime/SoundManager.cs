@@ -21,10 +21,10 @@ namespace SoundSystem
         private IEnumerator PlaySoundRoutine(Sound data)
         {
             AudioSource audioSource = gameObject.AddComponent<AudioSource>();
-            data.Configure(audioSource);
+            float length = data.Configure(audioSource);
             audioSource.Play();
 
-            yield return new WaitForSeconds(data.AudioLength);
+            yield return new WaitForSeconds(length);
 
             Destroy(audioSource);
         }
