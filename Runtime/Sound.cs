@@ -24,12 +24,12 @@ namespace SoundSystem
         public SoundLibrary MyLibrary { get => _myLibrary; }
         public string Name { get => clip.name; }
 
-        internal void Play()
+        public void Play()
         {
             SoundManager.Instance.Play(this);
         }
 
-        internal void Play(Vector3 position)
+        public void Play(Vector3 position)
         {
             SoundManager.Instance.Play(this, position);
         }

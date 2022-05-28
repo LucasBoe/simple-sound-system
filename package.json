@@ -1,7 +1,7 @@
 {
   "name": "com.lucasboe.simple-sound-system",
   "displayName": "LucasBoe SoundSystem",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "unity": "2020.3",
   "description": "a simple scriptable oject based sound integration solution.",
   "dependencies": {
@@ -22,6 +22,5 @@
     "type": "git",
     "url": "git+ssh://git@github.com/lucasboe/simple-sound-system.git"
   },
-  "license": "MIT",
   "author": "LucasBoe (https://l-boe.de)"
 }
