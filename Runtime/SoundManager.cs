@@ -10,6 +10,8 @@ namespace SoundSystem
         public static SoundManager Instance => instance;
         private static SoundManager instance;
 
+        Dictionary<PlayingSound, Sound> playingSounds = new Dictionary<PlayingSound, Sound>();
+
         protected virtual void Awake()
         {
             if (instance != null)
@@ -17,26 +19,90 @@ namespace SoundSystem
             else
                 instance = this;
         }
-
-        private IEnumerator PlaySoundRoutine(Sound data)
+        internal PlayingSound Play(Sound soundData, bool loop = false, float fadeDuration = 0.2f)
         {
-            AudioSource audioSource = gameObject.AddComponent<AudioSource>();
-            float length = data.Configure(audioSource);
-            audioSource.Play();
+            PlayingSound playingAudio = new PlayingSound();
+            playingAudio.FadeDuration = fadeDuration;
+            playingAudio.SoundData = soundData;
+            playingAudio.AudioSource = gameObject.AddComponent<AudioSource>();
+            playingAudio.Coroutine = StartCoroutine(PlaySoundRoutine(soundData, playingAudio, loop));
+            playingSounds.Add(playingAudio, soundData);
 
-            yield return new WaitForSeconds(length);
+            if (loop)
+                FadeIn(playingAudio.AudioSource, soundData.AudioVolume, fadeDuration);
 
-            Destroy(audioSource);
+            return playingAudio;
+        }
+        internal PlayingSound Play(Sound soundData, Vector3 position, bool loop = false, float fadeDuration = 0.2f)
+        {
+            return Play(soundData, loop);
         }
 
-        internal void Play(Sound soundData)
+        internal void Stop(Sound sound)
         {
-            StartCoroutine(PlaySoundRoutine(soundData));
+            List<PlayingSound> toStop = new List<PlayingSound>();
+
+            foreach (KeyValuePair<PlayingSound, Sound> playingSound in playingSounds)
+            {
+                if (playingSound.Value == sound)
+                    toStop.Add(playingSound.Key);
+            }
+
+            for (int i = toStop.Count - 1; i >= 0; i--)
+            {
+                toStop[i].Stop();
+            }
+        }
+        internal void Stop(PlayingSound sound)
+        {
+            sound.Stop();
         }
 
-        internal void Play(Sound soundData, Vector3 position)
+        private IEnumerator PlaySoundRoutine(Sound data, PlayingSound playing, bool loop)
         {
-            Play(soundData);
+            float length = data.Configure(playing.AudioSource, loop);
+            playing.AudioSource.Play();
+
+            if (!loop)
+            {
+                yield return new WaitForSeconds(length);
+                playing.Stop();
+            }
+        }
+        internal void FadeIn(AudioSource audioSource, float volume, float fadeDuration) => StartCoroutine(VolumeBlendRoutine(audioSource, 0f, volume, fadeDuration, null));
+        internal void FadeOut(AudioSource audioSource, float volume, float fadeDuration, Action onFinished) => StartCoroutine(VolumeBlendRoutine(audioSource, volume, 0f, fadeDuration, onFinished));
+        private IEnumerator VolumeBlendRoutine(AudioSource audioSource, float from, float to, float fadeDuration, Action onFinished)
+        {
+            float t = 0f;
+            while (t < 1f)
+            {
+                t += Time.deltaTime / fadeDuration;
+                float volume = Mathf.Lerp(from, to, t);
+                audioSource.volume = volume;
+                yield return null;
+            }
+
+            audioSource.volume = to;
+            onFinished?.Invoke();
+        }
+        internal void RemoveFromPlaying(PlayingSound playingAudio) => playingSounds.Remove(playingAudio);
+    }
+    public class PlayingSound
+    {
+        public Sound SoundData;
+        public AudioSource AudioSource;
+        public Coroutine Coroutine;
+        public float FadeDuration;
+
+        public void Stop()
+        {
+            SoundManager soundManager = SoundManager.Instance;
+
+            if (Coroutine != null)
+                soundManager.StopCoroutine(Coroutine);
+
+            soundManager.RemoveFromPlaying(this);
+            soundManager.FadeOut(AudioSource, SoundData.AudioVolume, FadeDuration, () => UnityEngine.Object.Destroy(AudioSource));
         }
     }
 }
