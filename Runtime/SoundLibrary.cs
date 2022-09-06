@@ -6,11 +6,10 @@ using UnityEngine.Audio;
 
 #if UNITY_EDITOR
 using UnityEditor;
+#endif
 
 namespace SoundSystem
 {
-#endif
-
     [CreateAssetMenu(fileName = "SoundLibrary", menuName = "SoundLibrary")]
     public class SoundLibrary : ScriptableObject
     {
