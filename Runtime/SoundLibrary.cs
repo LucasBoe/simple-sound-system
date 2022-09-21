@@ -16,11 +16,6 @@ namespace SoundSystem
         [SerializeField] public AudioMixerGroup audioMixerGroup;
         [SerializeField] private List<Sound> _sounds = new List<Sound>();
         public List<Sound> Sounds { get => _sounds; set => _sounds = value; }
-        public static string[] EditorGetSoundOptions()
-        {
-            SoundLibrary library = GetAllInstances<SoundLibrary>()[0];
-            return library.GetAllSounds();
-        }
 
         internal Sound FindSound(string name)
         {
@@ -44,6 +39,26 @@ namespace SoundSystem
             return result.ToArray();
         }
 
+#if UNITY_EDITOR
+        public static UnityEngine.Object EditorGetSoundData(string name)
+        {
+            SoundLibrary library = GetAllInstances<SoundLibrary>()[0];
+            foreach (Sound data in library.Sounds)
+            {
+                if (data.Name == name)
+                    return data as System.Object as UnityEngine.Object;
+            }
+
+            Debug.Log("Sound " + name + " not found!");
+
+            return null;
+        }
+        public static string[] EditorGetSoundOptions()
+        {
+            SoundLibrary library = GetAllInstances<SoundLibrary>()[0];
+            return library.GetAllSounds();
+        }
+
         private static T[] GetAllInstances<T>() where T : ScriptableObject
         {
             string[] guids = AssetDatabase.FindAssets("t:" + typeof(T).Name);  //FindAssets uses tags check documentation for more info
@@ -58,22 +73,6 @@ namespace SoundSystem
 
         }
 
-        public static UnityEngine.Object EditorGetSoundData(string name)
-        {
-            SoundLibrary library = GetAllInstances<SoundLibrary>()[0];
-            foreach (Sound data in library.Sounds)
-            {
-                if (data.Name == name)
-                    return data as System.Object as UnityEngine.Object;
-            }
-
-            Debug.Log("Sound " + name + " not found!");
-
-            return null;
-        }
-
-
-#if UNITY_EDITOR
         [ContextMenu("Add New")]
         [Button]
         private void AddNewSoundEntry()
@@ -90,9 +89,6 @@ namespace SoundSystem
             EditorUtility.SetDirty(damageType);
         }
 
-#endif
-
-#if UNITY_EDITOR
         [ContextMenu("Delete all")]
         private void DeleteAllSoundEntrys()
         {
