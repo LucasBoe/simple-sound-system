@@ -1,7 +1,7 @@
 {
   "name": "com.lucasboe.simple-sound-system",
   "displayName": "LucasBoe SoundSystem",
-  "version": "0.0.13",
+  "version": "0.0.14",
   "unity": "2020.3",
   "description": "a simple scriptable oject based sound integration solution.",
   "dependencies": {
@@ -9,8 +9,8 @@
   },
   "keywords": [
     "unity",
-	"unity3d",
-	"upm",
+    "unity3d",
+    "upm",
     "lucasboe",
     "utility"
   ],

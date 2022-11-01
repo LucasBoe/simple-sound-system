@@ -2,7 +2,6 @@
     "name": "LucasBoe.SimpleSoundSystem",
     "rootNamespace": "",
     "references": [
-        "com.dbrizov.naughtyattributes",
         "GUID:776d03a35f1b52c4a9aed9f56d7b4229"
     ],
     "includePlatforms": [],

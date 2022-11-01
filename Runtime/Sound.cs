@@ -7,7 +7,7 @@ using NaughtyAttributes;
 using UnityEditor;
 #endif
 
-namespace SoundSystem
+namespace Simple.SoundSystem
 {
     public class Sound : ScriptableObject
     {
@@ -33,7 +33,6 @@ namespace SoundSystem
         public void PlaySound() => SoundManager.Instance.Play(this);
         public void Stop() => SoundManager.Instance.Stop(this);
         public void StopLoop() => Stop();
-
 
         internal float Configure(AudioSource audioSource, bool loop)
         {
@@ -61,8 +60,8 @@ namespace SoundSystem
             EditorUtility.SetDirty(this);
         }
 
-        [ContextMenu("Delete this")]
         [Button]
+        [ContextMenu("Delete this")]
         private void DeleteThis()
         {
             _myLibrary.Sounds.Remove(this);
