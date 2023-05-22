@@ -1,31 +1,33 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NaughtyAttributes;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Simple.SoundSystem
+namespace Simple.SoundSystem.Core
 {
     public class Sound : ScriptableObject
     {
-        [SerializeField, ReadOnly] private SoundLibrary _myLibrary;
+        private SoundLibrary _myLibrary;
 
-        [SerializeField, OnValueChanged("Rename"), HideIf("useMultipleClipVariants")] AudioClip clip;
+        [SerializeField] AudioClip clip;
+        public AudioClip Clip => clip;
         [SerializeField] bool useMultipleClipVariants = false;
-        [SerializeField, ShowIf("useMultipleClipVariants"), OnValueChanged("Rename")] List<AudioClip> clips = new List<AudioClip>();
+        public bool UseMultipleClipVariants => useMultipleClipVariants;
+        [SerializeField] List<AudioClip> clips = new List<AudioClip>();
+        public List<AudioClip> Clips => clips;
         [SerializeField, Range(0, 1)] float volume = 0.5f;
 
-        [SerializeField, Range(0, 3), HideIf("randomizePitch")] float pitch = 1f;
-        [SerializeField, MinMaxSlider(0f, 3f), ShowIf("randomizePitch")] Vector2 pitchRange = new Vector2(0.75f, 1.25f);
+        [SerializeField, Range(0, 3)] float pitch = 1f;
+        [SerializeField] float pitchMin = 0.8f, pitchMax = 1.2f;
         [SerializeField] bool randomizePitch = false;
         public float AudioLength => clip.length;
         public float AudioVolume => volume;
 
         public SoundLibrary MyLibrary { get => _myLibrary; }
-        public string Name { get => clip != null ? clip.name : (clips.Count > 0 && clips[0] != null) ? clips[0].name : "New Sound"; }
+        public string Name { get => useMultipleClipVariants ? ((clips.Count > 0 && clips[0] != null) ? clips[0].name + "+++" : "New Sound") : (clip != null ? clip.name : "New Sound"); }
 
         public PlayingSound Play() { return SoundManager.Instance.Play(this); }
         public PlayingSound PlayLoop(float fadeDuration = 0.2f) { return SoundManager.Instance.Play(this, loop: true, fadeDuration); }
@@ -39,7 +41,7 @@ namespace Simple.SoundSystem
             AudioClip c = useMultipleClipVariants ? clips[Random.Range(0, clips.Count)] : clip;
             audioSource.clip = c;
             audioSource.volume = volume;
-            audioSource.pitch = randomizePitch ? Random.Range(pitchRange.x, pitchRange.y) : pitch;
+            audioSource.pitch = randomizePitch ? Random.Range(pitchMin, pitchMax) : pitch;
             audioSource.loop = loop;
             audioSource.outputAudioMixerGroup = _myLibrary.audioMixerGroup;
 
@@ -47,20 +49,21 @@ namespace Simple.SoundSystem
         }
 
 #if UNITY_EDITOR
-        public void Initialise(SoundLibrary mryLibrary)
+        public void Initialise(SoundLibrary mryLibrary, AudioClip clip = null)
         {
             _myLibrary = mryLibrary;
+            this.clip = clip;
+            Rename();
         }
 
         [ContextMenu("Rename to name")]
-        private void Rename()
+        public void Rename()
         {
             this.name = Name;
             AssetDatabase.SaveAssets();
             EditorUtility.SetDirty(this);
         }
 
-        [Button]
         [ContextMenu("Delete this")]
         private void DeleteThis()
         {

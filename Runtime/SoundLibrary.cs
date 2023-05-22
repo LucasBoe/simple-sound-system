@@ -1,14 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using NaughtyAttributes;
 using UnityEngine.Audio;
 
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
 
-namespace Simple.SoundSystem
+namespace Simple.SoundSystem.Core
 {
     [CreateAssetMenu(fileName = "SoundLibrary", menuName = "SoundLibrary")]
     public class SoundLibrary : ScriptableObject
@@ -73,20 +72,23 @@ namespace Simple.SoundSystem
 
         }
 
-        [ContextMenu("Add New")]
-        [Button]
-        private void AddNewSoundEntry()
+        [ContextMenu("AddNewEmptySoundEntry")]
+        private void AddNewEmptySoundEntry()
         {
-            Sound damageType = ScriptableObject.CreateInstance<Sound>();
-            damageType.name = "New Sound";
-            damageType.Initialise(this);
-            _sounds.Add(damageType);
+            AddNewSoundEntry();
+        }
 
-            AssetDatabase.AddObjectToAsset(damageType, this);
+        public void AddNewSoundEntry(AudioClip clip = null)
+        {
+            Sound soundEntry = ScriptableObject.CreateInstance<Sound>();
+            soundEntry.Initialise(this, clip);
+            _sounds.Add(soundEntry);
+
+            AssetDatabase.AddObjectToAsset(soundEntry, this);
             AssetDatabase.SaveAssets();
 
             EditorUtility.SetDirty(this);
-            EditorUtility.SetDirty(damageType);
+            EditorUtility.SetDirty(soundEntry);
         }
 
         [ContextMenu("Delete all")]

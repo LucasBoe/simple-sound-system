@@ -1,9 +1,7 @@
 {
-    "name": "LucasBoe.SimpleSoundSystem",
-    "rootNamespace": "",
-    "references": [
-        "GUID:776d03a35f1b52c4a9aed9f56d7b4229"
-    ],
+    "name": "LucasBoe.SimpleSoundSystem.Core",
+    "rootNamespace": "Simple.SoundSystem.Core",
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

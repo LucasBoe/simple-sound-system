@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Simple.SoundSystem
+namespace Simple.SoundSystem.Core
 {
     public class SoundManager : MonoBehaviour
     {
