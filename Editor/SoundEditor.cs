@@ -17,6 +17,11 @@ namespace Simple.SoundSystem.Core
             var centerLabel = new GUIStyle(EditorStyles.boldLabel);
             centerLabel.alignment = TextAnchor.MiddleCenter;
 
+            EditorGUI.BeginChangeCheck();  
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("myLibrary"));
+            if (EditorGUI.EndChangeCheck())
+                serializedObject.ApplyModifiedProperties();
+
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Single Clip", !sound.UseMultipleClipVariants ? centerLabel : new GUIStyle("minibuttonleft")))
             {

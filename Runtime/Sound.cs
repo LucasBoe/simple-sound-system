@@ -10,7 +10,7 @@ namespace Simple.SoundSystem.Core
 {
     public class Sound : ScriptableObject
     {
-        private SoundLibrary _myLibrary;
+        [SerializeField] private SoundLibrary myLibrary;
 
         [SerializeField] AudioClip clip;
         public AudioClip Clip => clip;
@@ -26,7 +26,7 @@ namespace Simple.SoundSystem.Core
         public float AudioLength => clip.length;
         public float AudioVolume => volume;
 
-        public SoundLibrary MyLibrary { get => _myLibrary; }
+        public SoundLibrary MyLibrary { get => myLibrary; }
         public string Name { get => useMultipleClipVariants ? ((clips.Count > 0 && clips[0] != null) ? clips[0].name + "+++" : "New Sound") : (clip != null ? clip.name : "New Sound"); }
 
         public PlayingSound Play() { return SoundManager.Instance.Play(this); }
@@ -43,15 +43,15 @@ namespace Simple.SoundSystem.Core
             audioSource.volume = volume;
             audioSource.pitch = randomizePitch ? Random.Range(pitchMin, pitchMax) : pitch;
             audioSource.loop = loop;
-            audioSource.outputAudioMixerGroup = _myLibrary.audioMixerGroup;
+            audioSource.outputAudioMixerGroup = myLibrary.audioMixerGroup;
 
             return c.length;
         }
 
 #if UNITY_EDITOR
-        public void Initialise(SoundLibrary mryLibrary, AudioClip clip = null)
+        public void Initialise(SoundLibrary myLibrary, AudioClip clip = null)
         {
-            _myLibrary = mryLibrary;
+            this.myLibrary = myLibrary;
             this.clip = clip;
             Rename();
         }
@@ -67,7 +67,7 @@ namespace Simple.SoundSystem.Core
         [ContextMenu("Delete this")]
         private void DeleteThis()
         {
-            _myLibrary.Sounds.Remove(this);
+            myLibrary.Sounds.Remove(this);
             Undo.DestroyObjectImmediate(this);
             AssetDatabase.SaveAssets();
         }
