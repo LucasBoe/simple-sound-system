@@ -27,7 +27,8 @@ namespace Simple.SoundSystem.Core
         public float AudioVolume => volume;
 
         public SoundLibrary MyLibrary { get => myLibrary; }
-        public string Name { get => useMultipleClipVariants ? ((clips.Count > 0 && clips[0] != null) ? clips[0].name + "+++" : "New Sound") : (clip != null ? clip.name : "New Sound"); }
+        [SerializeField] private string customName = "";
+        public string Name { get => customName != "" ? customName : (useMultipleClipVariants ? ((clips.Count > 0 && clips[0] != null) ? clips[0].name + "+++" : "New Sound") : (clip != null ? clip.name : "New Sound")); }
 
         public PlayingSound Play() { return SoundManager.Instance.Play(this); }
         public PlayingSound PlayLoop(float fadeDuration = 0.2f) { return SoundManager.Instance.Play(this, loop: true, fadeDuration); }
@@ -56,7 +57,7 @@ namespace Simple.SoundSystem.Core
             Rename();
         }
 
-        [ContextMenu("Rename to name")]
+        [ContextMenu("Update Name")]
         public void Rename()
         {
             this.name = Name;

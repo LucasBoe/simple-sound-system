@@ -17,8 +17,9 @@ namespace Simple.SoundSystem.Core
             var centerLabel = new GUIStyle(EditorStyles.boldLabel);
             centerLabel.alignment = TextAnchor.MiddleCenter;
 
-            EditorGUI.BeginChangeCheck();  
+            EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(serializedObject.FindProperty("myLibrary"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("customName"));
             if (EditorGUI.EndChangeCheck())
                 serializedObject.ApplyModifiedProperties();
 
