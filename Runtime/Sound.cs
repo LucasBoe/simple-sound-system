@@ -31,20 +31,40 @@ namespace Simple.SoundSystem.Core
         public string Name { get => customName != "" ? customName : (useMultipleClipVariants ? ((clips.Count > 0 && clips[0] != null) ? clips[0].name + "+++" : "New Sound") : (clip != null ? clip.name : "New Sound")); }
 
         public PlayingSound Play() { return SoundManager.Instance.Play(this); }
-        public PlayingSound PlayLoop(float fadeDuration = 0.2f) { return SoundManager.Instance.Play(this, loop: true, fadeDuration); }
+        public PlayingSound Play(bool loop = false, float fadeDuration = 0.2f, float volumeMultiplier = 1f, Vector3? customPosition = null, Transform customTarget = null, float customRange = 7f)
+        {
+            return SoundManager.Instance.Play(this, new SoundParameters()
+            {
+                Loop = loop,
+                FadeDuration = fadeDuration,
+                CustomVolumeMultiplier = volumeMultiplier,
+                CustomSpacialPosition = customPosition.Value,
+                CustomSpacialTransformTarget = customTarget,
+                CustomSpacialRange = customRange
+            });
+        }
+        public PlayingSound Play(SoundParameters parameters) { return SoundManager.Instance.Play(this, parameters); }
+        public PlayingSound PlayAt(Transform transform, float range = 7f) { return SoundManager.Instance.Play(this, new SoundParameters() { CustomSpacialTransformTarget = transform, CustomSpacialRange = range }); }
+        public PlayingSound PlayAt(Vector3 position, float range = 7f) { return SoundManager.Instance.Play(this, new SoundParameters() { CustomSpacialPosition = position, CustomSpacialRange = range }); }
+        public PlayingSound PlayLoop(float fadeDuration = 0.2f) { return SoundManager.Instance.Play(this, new SoundParameters() { Loop = true, FadeDuration = fadeDuration }); }
 
         public void PlaySound() => SoundManager.Instance.Play(this);
         public void Stop() => SoundManager.Instance.Stop(this);
         public void StopLoop() => Stop();
 
-        internal float Configure(AudioSource audioSource, bool loop)
+        internal float Configure(PlayingSound playing, SoundParameters parameters)
         {
+            AudioSource audioSource = playing.AudioSource;
+
             AudioClip c = useMultipleClipVariants ? clips[Random.Range(0, clips.Count)] : clip;
             audioSource.clip = c;
-            audioSource.volume = volume;
+            audioSource.volume = playing.Volume;
             audioSource.pitch = randomizePitch ? Random.Range(pitchMin, pitchMax) : pitch;
-            audioSource.loop = loop;
+            audioSource.loop = parameters.Loop;
             audioSource.outputAudioMixerGroup = myLibrary.audioMixerGroup;
+            audioSource.spatialBlend = parameters.IsSpacialSound ? 1 : 0;
+            audioSource.maxDistance = parameters.CustomSpacialRange;
+            audioSource.rolloffMode = AudioRolloffMode.Linear;
 
             return c.length;
         }

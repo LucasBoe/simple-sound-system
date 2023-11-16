@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 namespace Simple.SoundSystem.Core
 {
@@ -11,6 +12,7 @@ namespace Simple.SoundSystem.Core
         private static SoundManager instance;
 
         Dictionary<PlayingSound, Sound> playingSounds = new Dictionary<PlayingSound, Sound>();
+        CustomSpacialTargetHandler customTargets = new CustomSpacialTargetHandler();
 
         [SerializeField] bool log;
 
@@ -21,33 +23,33 @@ namespace Simple.SoundSystem.Core
             else
                 instance = this;
         }
-        internal PlayingSound Play(Sound soundData, bool loop = false, float fadeDuration = 0.2f)
+        internal PlayingSound Play(Sound soundData, SoundParameters parameters = null)
         {
-            PlayingSound playingAudio = new PlayingSound();
-            playingAudio.FadeDuration = fadeDuration;
-            playingAudio.SoundData = soundData;
-            playingAudio.AudioSource = gameObject.AddComponent<AudioSource>();
-            playingAudio.Coroutine = StartCoroutine(PlaySoundRoutine(soundData, playingAudio, loop));
-            playingSounds.Add(playingAudio, soundData);
+            if (parameters == null)
+                parameters = new SoundParameters();
 
-            Log("Play sound " + soundData.Name + " looping: " + loop);
+            PlayingSound playing = new PlayingSound();
+            playing.SoundData = soundData;
+            playing.Parameters = parameters;
+            playing.Volume = soundData.AudioVolume * parameters.CustomVolumeMultiplier;
+            playing.CustomTarget = parameters.IsSpacialSound ? customTargets.GetCustomTarget(parameters, playing) : null;
 
-            if (loop)
-                FadeIn(playingAudio.AudioSource, soundData.AudioVolume, fadeDuration);
+            var host = playing.CustomTarget != null ? playing.CustomTarget.Object : gameObject;
+            playing.AudioSource = host.AddComponent<AudioSource>();
+            playing.Coroutine = StartCoroutine(PlaySoundRoutine(soundData, playing, parameters));
+            playingSounds.Add(playing, soundData);
 
-            return playingAudio;
+            Log("Play sound " + soundData.Name + " looping: " + parameters.Loop);
+
+            if (parameters.Loop)
+                FadeIn(playing.AudioSource, playing.Volume, parameters.FadeDuration);
+
+            return playing;
         }
-
         private void Log(string message)
         {
             if (log) Debug.Log(message);
         }
-
-        internal PlayingSound Play(Sound soundData, Vector3 position, bool loop = false, float fadeDuration = 0.2f)
-        {
-            return Play(soundData, loop);
-        }
-
         internal void Stop(Sound sound)
         {
             Log("stop sound " + sound.Name);
@@ -69,13 +71,12 @@ namespace Simple.SoundSystem.Core
             sound.Stop();
         }
 
-        private IEnumerator PlaySoundRoutine(Sound data, PlayingSound playing, bool loop)
+        private IEnumerator PlaySoundRoutine(Sound data, PlayingSound playing, SoundParameters parameters)
         {
-            float length = data.Configure(playing.AudioSource, loop);
-            Log("sound " + data.Name + " configured, length: " + length);
+            float length = data.Configure(playing, parameters);
             playing.AudioSource.Play();
 
-            if (!loop)
+            if (!parameters.Loop)
             {
                 yield return new WaitForSeconds(length);
                 playing.Stop();
@@ -98,14 +99,23 @@ namespace Simple.SoundSystem.Core
             onFinished?.Invoke();
         }
         internal void RemoveFromPlaying(PlayingSound playingAudio) => playingSounds.Remove(playingAudio);
+        internal void DestroyPlayingInstance(PlayingSound playingSound)
+        {
+            if (playingSound.CustomTarget != null)
+            {
+                customTargets.RemoveFromCustomTarget(playingSound);
+            }
+            Destroy(playingSound.AudioSource);
+        }
     }
     public class PlayingSound
     {
         public Sound SoundData;
         public AudioSource AudioSource;
         public Coroutine Coroutine;
-        public float FadeDuration;
-
+        public SoundParameters Parameters;
+        public float Volume;
+        internal CustomSpacialTarget CustomTarget;
         public void Stop()
         {
             SoundManager soundManager = SoundManager.Instance;
@@ -114,7 +124,10 @@ namespace Simple.SoundSystem.Core
                 soundManager.StopCoroutine(Coroutine);
 
             soundManager.RemoveFromPlaying(this);
-            soundManager.FadeOut(AudioSource, SoundData.AudioVolume, FadeDuration, () => UnityEngine.Object.Destroy(AudioSource));
+            soundManager.FadeOut(AudioSource, Volume, Parameters.FadeDuration, () =>
+            {
+                soundManager.DestroyPlayingInstance(this);
+            });
         }
     }
 }
