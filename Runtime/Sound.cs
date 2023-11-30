@@ -38,7 +38,7 @@ namespace Simple.SoundSystem.Core
                 Loop = loop,
                 FadeDuration = fadeDuration,
                 CustomVolumeMultiplier = volumeMultiplier,
-                CustomSpacialPosition = customPosition.Value,
+                CustomSpacialPosition = customPosition,
                 CustomSpacialTransformTarget = customTarget,
                 CustomSpacialRange = customRange
             });
