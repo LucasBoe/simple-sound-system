@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -56,11 +57,12 @@ namespace Simple.SoundSystem.Core
         {
             AudioSource audioSource = playing.AudioSource;
 
-            AudioClip c = useMultipleClipVariants ? clips[Random.Range(0, clips.Count)] : clip;
+            AudioClip c = useMultipleClipVariants ? clips[UnityEngine.Random.Range(0, clips.Count)] : clip;
             audioSource.clip = c;
             audioSource.volume = playing.Volume;
-            audioSource.pitch = randomizePitch ? Random.Range(pitchMin, pitchMax) : pitch;
+            audioSource.pitch = randomizePitch ? UnityEngine.Random.Range(pitchMin, pitchMax) : pitch;
             audioSource.loop = parameters.Loop;
+            audioSource.time = parameters.Loop ? UnityEngine.Random.Range(0f, clip.length) : 0f;
             audioSource.outputAudioMixerGroup = myLibrary.audioMixerGroup;
             audioSource.spatialBlend = parameters.IsSpacialSound ? 1 : 0;
             audioSource.maxDistance = parameters.CustomSpacialRange;
