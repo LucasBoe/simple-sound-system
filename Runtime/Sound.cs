@@ -94,6 +94,14 @@ namespace Simple.SoundSystem.Core
             Undo.DestroyObjectImmediate(this);
             AssetDatabase.SaveAssets();
         }
+
+        public bool ContainsClip(AudioClip clip)
+        {
+            if (!useMultipleClipVariants)
+                return clip == this.clip;
+
+            return clips.Contains(clip);
+        }
 #endif
     }
 }

@@ -15,7 +15,6 @@ namespace Simple.SoundSystem.Core
         [SerializeField] public AudioMixerGroup audioMixerGroup;
         [SerializeField] private List<Sound> _sounds = new List<Sound>();
         public List<Sound> Sounds { get => _sounds; set => _sounds = value; }
-
         internal Sound FindSound(string name)
         {
             foreach (Sound data in Sounds)
@@ -78,7 +77,7 @@ namespace Simple.SoundSystem.Core
             AddNewSoundEntry();
         }
 
-        public void AddNewSoundEntry(AudioClip clip = null)
+        public Sound AddNewSoundEntry(AudioClip clip = null)
         {
             Sound soundEntry = ScriptableObject.CreateInstance<Sound>();
             soundEntry.Initialise(this, clip);
@@ -89,6 +88,8 @@ namespace Simple.SoundSystem.Core
 
             EditorUtility.SetDirty(this);
             EditorUtility.SetDirty(soundEntry);
+
+            return soundEntry;
         }
 
         [ContextMenu("Delete all")]

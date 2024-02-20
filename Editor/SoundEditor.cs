@@ -45,6 +45,12 @@ namespace Simple.SoundSystem.Core
                 sound.Rename();
             }
 
+            if (GUILayout.Button(new GUIContent($"Preview Clip{(sound.UseMultipleClipVariants ? "s" : "")}", EditorGUIUtility.FindTexture("Animation.Play"))))
+            {
+                var toPlay = (clipProp.isArray ? clipProp.GetArrayElementAtIndex(UnityEngine.Random.Range(0, clipProp.arraySize)) : clipProp).objectReferenceValue.GetInstanceID();
+                AssetDatabase.OpenAsset(toPlay);
+            }
+
             EditorGUI.BeginChangeCheck();
             EditorGUILayout.PropertyField(serializedObject.FindProperty("volume"));
             if (EditorGUI.EndChangeCheck())
