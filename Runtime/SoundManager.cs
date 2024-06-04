@@ -87,7 +87,7 @@ namespace Simple.SoundSystem.Core
         private IEnumerator VolumeBlendRoutine(AudioSource audioSource, float from, float to, float fadeDuration, Action onFinished)
         {
             float t = 0f;
-            while (t < 1f)
+            while (t < 1f && audioSource != null)
             {
                 t += Time.deltaTime / fadeDuration;
                 float volume = Mathf.Lerp(from, to, t);
@@ -95,7 +95,9 @@ namespace Simple.SoundSystem.Core
                 yield return null;
             }
 
-            audioSource.volume = to;
+            if (audioSource != null)
+                audioSource.volume = to;
+
             onFinished?.Invoke();
         }
         internal void RemoveFromPlaying(PlayingSound playingAudio) => playingSounds.Remove(playingAudio);
