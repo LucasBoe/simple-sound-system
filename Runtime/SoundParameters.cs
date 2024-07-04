@@ -12,6 +12,8 @@ namespace Simple.SoundSystem.Core
         public Vector3? CustomSpacialPosition;
         public Transform CustomSpacialTransformTarget;
         public float CustomSpacialRange = 7f;
+        public bool LoopRandomizeStartTime = true;
+        public bool AlsoFadeInNotOnlyOut = true;
         public bool IsSpacialSound => CustomSpacialTransformTarget != null || CustomSpacialPosition != null;
     }
 }

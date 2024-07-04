@@ -32,7 +32,16 @@ namespace Simple.SoundSystem.Core
         public string Name { get => customName != "" ? customName : (useMultipleClipVariants ? ((clips.Count > 0 && clips[0] != null) ? clips[0].name + "+++" : "New Sound") : (clip != null ? clip.name : "New Sound")); }
 
         public PlayingSound Play() { return SoundManager.Instance.Play(this); }
-        public PlayingSound Play(bool loop = false, float fadeDuration = 0.2f, float volumeMultiplier = 1f, Vector3? customPosition = null, Transform customTarget = null, float customRange = 7f)
+        public PlayingSound Play(
+            bool loop = false,
+            float fadeDuration = 0.2f,
+            float volumeMultiplier = 1f,
+            Vector3? customPosition = null,
+            Transform customTarget = null,
+            float customRange = 7f,
+            bool loopRandomizeStartTime = true,
+            bool alsoFadeInNotOnlyOut = true
+            )
         {
             return SoundManager.Instance.Play(this, new SoundParameters()
             {
@@ -41,7 +50,9 @@ namespace Simple.SoundSystem.Core
                 CustomVolumeMultiplier = volumeMultiplier,
                 CustomSpacialPosition = customPosition,
                 CustomSpacialTransformTarget = customTarget,
-                CustomSpacialRange = customRange
+                CustomSpacialRange = customRange,
+                LoopRandomizeStartTime = loopRandomizeStartTime, 
+                AlsoFadeInNotOnlyOut = alsoFadeInNotOnlyOut
             });
         }
         public PlayingSound Play(SoundParameters parameters) { return SoundManager.Instance.Play(this, parameters); }
@@ -62,7 +73,7 @@ namespace Simple.SoundSystem.Core
             audioSource.volume = playing.Volume;
             audioSource.pitch = randomizePitch ? UnityEngine.Random.Range(pitchMin, pitchMax) : pitch;
             audioSource.loop = parameters.Loop;
-            audioSource.time = parameters.Loop ? UnityEngine.Random.Range(0f, clip.length) : 0f;
+            audioSource.time = parameters.Loop && parameters.LoopRandomizeStartTime ? UnityEngine.Random.Range(0f, clip.length) : 0f;
             audioSource.outputAudioMixerGroup = myLibrary.audioMixerGroup;
             audioSource.spatialBlend = parameters.IsSpacialSound ? 1 : 0;
             audioSource.maxDistance = parameters.CustomSpacialRange;

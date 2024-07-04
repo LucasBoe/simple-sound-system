@@ -41,7 +41,7 @@ namespace Simple.SoundSystem.Core
 
             Log("Play sound " + soundData.Name + " looping: " + parameters.Loop);
 
-            if (parameters.Loop)
+            if (parameters.Loop && parameters.AlsoFadeInNotOnlyOut)
                 FadeIn(playing.AudioSource, playing.Volume, parameters.FadeDuration);
 
             return playing;
