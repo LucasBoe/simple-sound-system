@@ -51,7 +51,7 @@ namespace Simple.SoundSystem.Core
                 CustomSpacialPosition = customPosition,
                 CustomSpacialTransformTarget = customTarget,
                 CustomSpacialRange = customRange,
-                LoopRandomizeStartTime = loopRandomizeStartTime, 
+                LoopRandomizeStartTime = loopRandomizeStartTime,
                 AlsoFadeInNotOnlyOut = alsoFadeInNotOnlyOut
             });
         }
@@ -67,13 +67,14 @@ namespace Simple.SoundSystem.Core
         internal float Configure(PlayingSound playing, SoundParameters parameters)
         {
             AudioSource audioSource = playing.AudioSource;
+            audioSource.Stop();
 
             AudioClip c = useMultipleClipVariants ? clips[UnityEngine.Random.Range(0, clips.Count)] : clip;
             audioSource.clip = c;
             audioSource.volume = playing.Volume;
             audioSource.pitch = randomizePitch ? UnityEngine.Random.Range(pitchMin, pitchMax) : pitch;
             audioSource.loop = parameters.Loop;
-            audioSource.time = parameters.Loop && parameters.LoopRandomizeStartTime ? UnityEngine.Random.Range(0f, clip.length) : 0f;
+            audioSource.time = Mathf.Min(parameters.Loop && parameters.LoopRandomizeStartTime ? UnityEngine.Random.Range(0f, clip.length) : 0f, clip.length);
             audioSource.outputAudioMixerGroup = myLibrary.audioMixerGroup;
             audioSource.spatialBlend = parameters.IsSpacialSound ? 1 : 0;
             audioSource.maxDistance = parameters.CustomSpacialRange;
