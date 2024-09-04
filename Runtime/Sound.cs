@@ -74,7 +74,8 @@ namespace Simple.SoundSystem.Core
             audioSource.volume = playing.Volume;
             audioSource.pitch = randomizePitch ? UnityEngine.Random.Range(pitchMin, pitchMax) : pitch;
             audioSource.loop = parameters.Loop;
-            audioSource.time = Mathf.Min(parameters.Loop && parameters.LoopRandomizeStartTime ? UnityEngine.Random.Range(0f, clip.length) : 0f, clip.length);
+            bool setRandomLoopTime = parameters.Loop && parameters.LoopRandomizeStartTime && clip.length > 1f; //if the clip is too short, unity errors occur
+            audioSource.time = setRandomLoopTime ? UnityEngine.Random.Range(0f, clip.length) : 0f;
             audioSource.outputAudioMixerGroup = myLibrary.audioMixerGroup;
             audioSource.spatialBlend = parameters.IsSpacialSound ? 1 : 0;
             audioSource.maxDistance = parameters.CustomSpacialRange;
