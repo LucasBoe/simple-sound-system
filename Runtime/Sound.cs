@@ -78,6 +78,7 @@ namespace Simple.SoundSystem.Core
             audioSource.time = setRandomLoopTime ? UnityEngine.Random.Range(0f, clip.length) : 0f;
             audioSource.outputAudioMixerGroup = myLibrary.audioMixerGroup;
             audioSource.spatialBlend = parameters.IsSpacialSound ? 1 : 0;
+            audioSource.minDistance = (.3f + parameters.CustomSpacialRange / 20f);
             audioSource.maxDistance = parameters.CustomSpacialRange;
             audioSource.rolloffMode = AudioRolloffMode.Linear;
 
