@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
+using UnityEngine.Serialization;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -12,8 +13,10 @@ namespace Simple.SoundSystem.Core
     [CreateAssetMenu(fileName = "SoundLibrary", menuName = "SoundLibrary")]
     public class SoundLibrary : ScriptableObject
     {
-        [SerializeField] public AudioMixerGroup audioMixerGroup;
+        [FormerlySerializedAs("audioMixerGroup")] [SerializeField] public AudioMixerGroup AudioMixerGroup;
         [SerializeField] private List<Sound> _sounds = new List<Sound>();
+        [SerializeField] private bool ignoreListenerPause = false;
+        public bool IgnoreListenerPause { get => ignoreListenerPause; }
         public List<Sound> Sounds { get => _sounds; set => _sounds = value; }
         internal Sound FindSound(string name)
         {

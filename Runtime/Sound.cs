@@ -76,7 +76,8 @@ namespace Simple.SoundSystem.Core
             audioSource.loop = parameters.Loop;
             bool setRandomLoopTime = parameters.Loop && parameters.LoopRandomizeStartTime && clip.length > 1f; //if the clip is too short, unity errors occur
             audioSource.time = setRandomLoopTime ? UnityEngine.Random.Range(0f, clip.length) : 0f;
-            audioSource.outputAudioMixerGroup = myLibrary.audioMixerGroup;
+            audioSource.outputAudioMixerGroup = myLibrary.AudioMixerGroup;
+            audioSource.ignoreListenerPause = myLibrary.IgnoreListenerPause;
             audioSource.spatialBlend = parameters.IsSpacialSound ? 1 : 0;
             audioSource.minDistance = (.3f + parameters.CustomSpacialRange / 20f);
             audioSource.maxDistance = parameters.CustomSpacialRange;
