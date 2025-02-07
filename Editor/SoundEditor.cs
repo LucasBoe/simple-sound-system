@@ -104,6 +104,15 @@ namespace Simple.SoundSystem.Core
                 randomizeProp.boolValue = after;
                 serializedObject.ApplyModifiedProperties();
             }
+
+            var validationProp = serializedObject.FindProperty("needsValidation");
+            var beforeV = validationProp.boolValue;
+            var afterV = GUILayout.Toggle(beforeV, "Needs Validation");
+            if (afterV != beforeV)
+            {
+                validationProp.boolValue = afterV;
+                serializedObject.ApplyModifiedProperties();
+            }
         }
     }
 }

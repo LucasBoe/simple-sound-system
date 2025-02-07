@@ -1,7 +1,7 @@
 {
   "name": "com.lucasboe.simple-sound-system",
   "displayName": "LucasBoe SoundSystem",
-  "version": "0.2.71",
+  "version": "0.2.72",
   "unity": "2020.3",
   "description": "a simple scriptable object based sound integration solution.",
   "keywords": [
