@@ -26,6 +26,8 @@ namespace Simple.SoundSystem.Core
         }
         internal PlayingSound Play(Sound soundData, SoundParameters parameters = null)
         {
+            PlayingSound playing = new PlayingSound();
+
             if (validator != null && soundData.NeedsValidation)
             {
                 if (parameters.IsSpacialSound)
@@ -46,7 +48,6 @@ namespace Simple.SoundSystem.Core
             if (parameters == null)
                 parameters = new SoundParameters();
 
-            PlayingSound playing = new PlayingSound();
             playing.SoundData = soundData;
             playing.Parameters = parameters;
             playing.Volume = soundData.AudioVolume * parameters.CustomVolumeMultiplier;
