@@ -20,17 +20,16 @@ namespace Simple.SoundSystem.Core
         [SerializeField] List<AudioClip> clips = new List<AudioClip>();
         public List<AudioClip> Clips => clips;
         [SerializeField, Range(0, 1)] float volume = 0.5f;
-
         [SerializeField, Range(0, 3)] float pitch = 1f;
         [SerializeField] float pitchMin = 0.8f, pitchMax = 1.2f;
         [SerializeField] bool randomizePitch = false;
+        [SerializeField] bool needsValidation = false;
         public float AudioLength => clip.length;
         public float AudioVolume => volume;
-
+        public bool NeedsValidation => needsValidation;
         public SoundLibrary MyLibrary { get => myLibrary; }
         [SerializeField] private string customName = "";
         public string Name { get => customName != "" ? customName : (useMultipleClipVariants ? ((clips.Count > 0 && clips[0] != null) ? clips[0].name + "+++" : "New Sound") : (clip != null ? clip.name : "New Sound")); }
-
         public PlayingSound Play() { return SoundManager.Instance.Play(this); }
         public PlayingSound Play(
             bool loop = false,

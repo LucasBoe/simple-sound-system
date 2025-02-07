@@ -8,6 +8,7 @@ namespace Simple.SoundSystem.Core
 {
     public class SoundManager : MonoBehaviour
     {
+        [SerializeField] SoundValidator validator;
         public static SoundManager Instance => instance;
         private static SoundManager instance;
 
@@ -25,6 +26,23 @@ namespace Simple.SoundSystem.Core
         }
         internal PlayingSound Play(Sound soundData, SoundParameters parameters = null)
         {
+            if (validator != null && soundData.NeedsValidation)
+            {
+                if (parameters.IsSpacialSound)
+                {
+                    var target = customTargets.GetCustomTarget(parameters, playing);
+                    var pos = target.Object != null ? target.Object.transform.position : target.PosRef.Value;
+                    
+                    if (!validator.ValidateSound3D(soundData, pos))
+                        return null;
+                }
+                else
+                {
+                    if (!validator.ValidateSound(soundData))
+                        return null;
+                }
+            }
+            
             if (parameters == null)
                 parameters = new SoundParameters();
 
