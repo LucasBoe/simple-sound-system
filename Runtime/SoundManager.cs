@@ -24,6 +24,7 @@ namespace Simple.SoundSystem.Core
             else
                 instance = this;
         }
+
         internal PlayingSound Play(Sound soundData, SoundParameters parameters = null)
         {
             PlayingSound playing = new PlayingSound();
@@ -34,7 +35,7 @@ namespace Simple.SoundSystem.Core
                 {
                     var target = customTargets.GetCustomTarget(parameters, playing);
                     var pos = target.Object != null ? target.Object.transform.position : target.PosRef.Value;
-                    
+
                     if (!validator.ValidateSound3D(soundData, pos))
                         return null;
                 }
@@ -44,14 +45,15 @@ namespace Simple.SoundSystem.Core
                         return null;
                 }
             }
-            
+
             if (parameters == null)
                 parameters = new SoundParameters();
 
             playing.SoundData = soundData;
             playing.Parameters = parameters;
             playing.Volume = soundData.AudioVolume * parameters.CustomVolumeMultiplier;
-            playing.CustomTarget = parameters.IsSpacialSound ? customTargets.GetCustomTarget(parameters, playing) : null;
+            playing.CustomTarget =
+                parameters.IsSpacialSound ? customTargets.GetCustomTarget(parameters, playing) : null;
 
             var host = playing.CustomTarget != null ? playing.CustomTarget.Object : gameObject;
             playing.AudioSource = host.AddComponent<AudioSource>();
@@ -61,14 +63,16 @@ namespace Simple.SoundSystem.Core
             Log("Play sound " + soundData.Name + " looping: " + parameters.Loop);
 
             if (parameters.Loop && parameters.AlsoFadeInNotOnlyOut)
-                FadeIn(playing.AudioSource, playing.Volume, parameters.FadeDuration);
+                FadeIn(playing.AudioSource, playing.Volume, parameters.FadeDuration, soundData.MyLibrary.IgnoreListenerPause);
 
             return playing;
         }
+
         private void Log(string message)
         {
             if (log) Debug.Log(message);
         }
+
         internal void Stop(Sound sound)
         {
             Log("stop sound " + sound.Name);
@@ -85,6 +89,7 @@ namespace Simple.SoundSystem.Core
                 toStop[i].Stop();
             }
         }
+
         internal void Stop(PlayingSound sound)
         {
             sound.Stop();
@@ -96,19 +101,30 @@ namespace Simple.SoundSystem.Core
             playing.AudioSource.Play();
 
             if (!parameters.Loop)
-            {
-                yield return new WaitForSeconds(length);
-                playing.Stop();
-            }
+
+                if (data.MyLibrary.IgnoreListenerPause)
+                    yield return new WaitForSecondsRealtime(length);
+                else
+                    yield return new WaitForSeconds(length);
+
+            playing.Stop();
+
         }
-        internal void FadeIn(AudioSource audioSource, float volume, float fadeDuration) => StartCoroutine(VolumeBlendRoutine(audioSource, 0f, volume, fadeDuration, null));
-        internal void FadeOut(AudioSource audioSource, float volume, float fadeDuration, Action onFinished) => StartCoroutine(VolumeBlendRoutine(audioSource, volume, 0f, fadeDuration, onFinished));
-        private IEnumerator VolumeBlendRoutine(AudioSource audioSource, float from, float to, float fadeDuration, Action onFinished)
+
+        internal void FadeIn(AudioSource audioSource, float volume, float fadeDuration,  bool useUnscaledTime) =>
+            StartCoroutine(VolumeBlendRoutine(audioSource, 0f, volume, fadeDuration, useUnscaledTime, null));
+
+        internal void FadeOut(AudioSource audioSource, float volume, float fadeDuration, bool useUnscaledTime, Action onFinished) =>
+            StartCoroutine(VolumeBlendRoutine(audioSource, volume, 0f, fadeDuration, useUnscaledTime, onFinished));
+
+        private IEnumerator VolumeBlendRoutine(AudioSource audioSource, float from, float to, float fadeDuration,
+            bool useUnscaledTime, Action onFinished)
         {
+
             float t = 0f;
             while (t < 1f && audioSource != null)
             {
-                t += Time.deltaTime / fadeDuration;
+                t += useUnscaledTime ? Time.unscaledDeltaTime : Time.deltaTime / fadeDuration;
                 float volume = Mathf.Lerp(from, to, t);
                 audioSource.volume = volume;
                 yield return null;
@@ -119,16 +135,20 @@ namespace Simple.SoundSystem.Core
 
             onFinished?.Invoke();
         }
+
         internal void RemoveFromPlaying(PlayingSound playingAudio) => playingSounds.Remove(playingAudio);
+
         internal void DestroyPlayingInstance(PlayingSound playingSound)
         {
             if (playingSound.CustomTarget != null)
             {
                 customTargets.RemoveFromCustomTarget(playingSound);
             }
+
             Destroy(playingSound.AudioSource);
         }
     }
+
     public class PlayingSound
     {
         public Sound SoundData;
@@ -137,6 +157,7 @@ namespace Simple.SoundSystem.Core
         public SoundParameters Parameters;
         public float Volume;
         internal CustomSpacialTarget CustomTarget;
+
         public void Stop()
         {
             SoundManager soundManager = SoundManager.Instance;
@@ -145,10 +166,8 @@ namespace Simple.SoundSystem.Core
                 soundManager.StopCoroutine(Coroutine);
 
             soundManager.RemoveFromPlaying(this);
-            soundManager.FadeOut(AudioSource, Volume, Parameters.FadeDuration, () =>
-            {
-                soundManager.DestroyPlayingInstance(this);
-            });
+            soundManager.FadeOut(AudioSource, Volume, Parameters.FadeDuration, SoundData.MyLibrary.IgnoreListenerPause,
+                () => { soundManager.DestroyPlayingInstance(this); });
         }
     }
 }
