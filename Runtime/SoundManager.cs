@@ -101,14 +101,14 @@ namespace Simple.SoundSystem.Core
             playing.AudioSource.Play();
 
             if (!parameters.Loop)
-
+            {
                 if (data.MyLibrary.IgnoreListenerPause)
                     yield return new WaitForSecondsRealtime(length);
                 else
                     yield return new WaitForSeconds(length);
 
-            playing.Stop();
-
+                playing.Stop();
+            }
         }
 
         internal void FadeIn(AudioSource audioSource, float volume, float fadeDuration,  bool useUnscaledTime) =>
